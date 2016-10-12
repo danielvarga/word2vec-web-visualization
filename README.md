@@ -27,13 +27,14 @@ Example:
 python server.py --glove glove.840B.50k.300d.txt --port 8080
 ```
 
+See below for details about where to get such data files from.
 After starting the server, please wait until the ```Service has started.``` logline appears.
 
 
 ### Using the service
 
 Click the below link, and click on some blue circles:
-http://localhost:8080/vis/
+- http://localhost:8080/vis/
 
 You can start from any given word:
 - http://localhost:8080/vis/?q=token
@@ -88,9 +89,14 @@ http://delight.prez.is:8080/glove/?q=cica&limit=5
 The service needs word vectors to work. For convenience, I've created a few small datasets, you can grab them from here:
 
 ```
-wget ftp://ftp.mokk.bme.hu/User/daniel/glove/glove.840B.50k.300d.txt # English dataset, 50k most frequent words, dimension 300.
-wget ftp://ftp.mokk.bme.hu/User/daniel/glove/glove.840B.10k.300d.txt # The same dataset with 10k most frequent words.
-wget ftp://ftp.mokk.bme.hu/User/daniel/glove/glove-hu.200k.200d.txt  # Hungarian dataset, 200k words, dimension 200.
+# English dataset, 50k most frequent words, dimension 300.
+wget ftp://ftp.mokk.bme.hu/User/daniel/glove/glove.840B.50k.300d.txt
+
+# The same dataset with the 10k most frequent words.
+wget ftp://ftp.mokk.bme.hu/User/daniel/glove/glove.840B.10k.300d.txt
+
+# Hungarian dataset, 200k words, dimension 200.
+wget ftp://ftp.mokk.bme.hu/User/daniel/glove/glove-hu.200k.200d.txt
 ```
 
 The English datasets were directly based on this one: [`http://nlp.stanford.edu/projects/glove/`](http://nlp.stanford.edu/projects/glove/) , like this:
@@ -98,4 +104,4 @@ The English datasets were directly based on this one: [`http://nlp.stanford.edu/
 ```wget http://www-nlp.stanford.edu/data/glove.42B.300d.txt.gz```
 
 The Hungarian dataset was created by Kata Gabor and David Takacs. Thanks a lot!
-The filename is my misnomer, they have used word2vec.
+The filename is my misnomer, the dataset was created using word2vec.
