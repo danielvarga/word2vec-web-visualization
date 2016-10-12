@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Glove word cloud visualization</title>
+    <script type="text/javascript" src="/vis/d3.min.js"></script>
+    <style type="text/css">
+      /* No style rules here yet */
+    </style>
+  </head>
+  <!-- http://stackoverflow.com/questions/23378540/select-dot-in-scatter-plot-based-on-data-id-in-d3js -->
+  <!-- http://pothibo.com/2013/09/d3-js-how-to-handle-dynamic-json-data/ -->
+
+  <body>
+    <script type="text/javascript">
+
+  var w = window.innerWidth;
+  var h = window.innerHeight;
+  var minSize = d3.min([w, h]);
+  var xMargin = 0.2;
+  var yMargin = 0.2;
+
+  var xScale = d3.scale.linear().range([w/2-minSize/2*(1-xMargin), w/2+minSize/2*(1-xMargin)]);
+  var yScale = d3.scale.linear().range([h/2-minSize/2*(1-yMargin), h/2+minSize/2*(1-yMargin)]);
+
+  function x(d) { return xScale(d[1]); }
+  function y(d) { return yScale(d[2]); }
+  function textY(d) { return y(d)-6; }
+
+  function update(word, svg) {
+      var url = "/vis/?q="+word;
+      var endpointUrl = "/glove/?limit=50&q="+word;
+      if (g_localProjection) {
+        url += "&lp=1";
+	endpointUrl += "&globalProjection=0";
+      }
+      window.history.pushState(word, "Glove word cloud : "+word, url);
+      d3.json(endpointUrl, function(error, root) {
+        if (error) throw error;
+
+        var gText = svg.selectAll("text")
+            // We want objects to be identified by their text content,
+            // not their index in the array, hence the extra accessor.
+            // http://stackoverflow.com/questions/19268360/i-want-to-update-the-data-on-this-d3-js-bar-chart-by-clicking-a-button-onclick
+            .data(root.objects, function(d) { return "text_"+d[0]; } );
+        var gCirc = svg.selectAll(".dot")
+            .data(root.objects, function(d) { return "circ_"+d[0]; } );
+
+	var xCoords = root.objects.map( function(d) { return d[1] } );
+	var yCoords = root.objects.map( function(d) { return d[2] } );
+	xScale.domain([d3.min(xCoords), d3.max(xCoords)]);
+	yScale.domain([d3.min(yCoords), d3.max(yCoords)]);
+
+        gCirc.transition()
+             .duration(2000)
+             .attr("cx", x)
+             .attr("cy", y);
+        gText.transition()
+             .duration(2000)
+             .attr("x", x)
+             .attr("y", textY);
+
+        gText.enter().append("text")
+          .text(function(d) { return d[0]; })
+          .attr("x", x)
+          .attr("y", textY)
+          .attr("text-anchor", "middle")
+          .attr("id", function(d) { return d[0]; })
+          .attr("font-family", "sans-serif")
+          .attr("font-size", "20px")
+          .attr("fill", "black")
+          .attr('opacity', 1e-6)
+          .transition()
+          .duration(1500)
+          .attr('opacity', 1);
+
+        gCirc.enter().append("svg:circle")
+            // TODO The text should be highlighted if the circle gets a mouseover.
+            .on("mouseover", function(d) { d3.select(this).attr("fill-opacity", 0.8); })
+            .on("mouseout", function(d) { d3.select(this).attr("fill-opacity", 0.3); })
+            .on("click", function(d) {
+                update(d[0], svg);
+            })
+            .attr("class", "dot")
+            .attr("r", 10)
+            .attr("stroke", "")
+            .attr("cx", x)
+            .attr("cy", y)
+            .attr("id", function(d) { return d[0]; })
+            .style("fill", "blue")
+            .attr("fill-opacity", 1e-6)
+            .transition()
+            .duration(1500)
+            .attr('fill-opacity', 0.3)
+            ;
+
+        gText.exit().transition()
+             .duration(1000)
+             .attr('opacity', 1e-6)
+             .remove();
+
+        gCirc.exit().transition()
+             .duration(1000)
+             .attr('fill-opacity', 1e-6)
+             .remove();
+
+      });
+  }
+
+  function getQueryVariable(variable) {
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i=0;i<vars.length;i++) {
+      var pair = vars[i].split("=");
+      if(pair[0] == variable) {return pair[1];}
+    }
+    return(false);
+  }
+
+  function init() {
+
+      var svg = d3.select("body")
+            .append("svg")
+            .attr("width", w)
+            .attr("height", h);
+
+      var word = "hold";
+      urlWord = getQueryVariable("q");
+      if (urlWord) {
+        word = urlWord;
+        word = word.replace("/","");
+      }
+
+      // Global variable!
+      if (getQueryVariable("lp")==1) {
+        g_localProjection = 1;
+      } else {
+        g_localProjection = 0;
+      }
+
+      update(word, svg);
+  }
+
+  init();
+
+
+    </script>
+  </body>
+</html>
