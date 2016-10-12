@@ -84,12 +84,12 @@ g_glove = None
 def main():
     global g_glove
     parser = argparse.ArgumentParser(description='Backend service for word2vec visualizations.')
-    parser.add_argument('--glove', type=str, help='''filename of glove data file or serialized GloveService.
-If the filename ends with .txt, it's interpreted as glove data file, otherwise two files are looked for,
+    parser.add_argument('--glove', type=str, help='''filename of word embedding data file or serialized GloveService.
+If the filename ends with .txt, it's interpreted as word embedding data file, otherwise two files are looked for,
 filename.ann and filename.json. This argument is mandatory.''')
     parser.add_argument('--port',  type=int, default=8080, help='port of service.')
     parser.add_argument('--globalProjection', action='store_true',
-            help='''use a single SVD for the whole dataset instead of building it from local data.
+            help='''use a single SVD for the whole dataset instead of always building it from local data.
 Can be overridden with /glove/?q=query&globalProjection=0''')
     args = parser.parse_args()
 
