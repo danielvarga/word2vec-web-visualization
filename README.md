@@ -86,20 +86,27 @@ http://delight.prez.is:8080/glove/?q=cica&limit=5
 
 ### Word embedding data
 
-The service needs word vectors to work. For convenience, I've created a few small datasets, you can grab them from here:
+The service needs word vectors to work. The input file format is simply
+whitespace-delimited, each line starting with a word and continuing
+with a real word embedding vector.
+
+For convenience, I've assembled a few datasets, you can grab them from here:
 
 ```
-# English dataset, 50k most frequent words, dimension 300.
+# English dataset, 10k most frequent words, dimension 300.
+wget ftp://ftp.mokk.bme.hu/User/daniel/glove/glove.840B.10k.300d.txt
+
+# The same dataset with the 50k most frequent words.
 wget ftp://ftp.mokk.bme.hu/User/daniel/glove/glove.840B.50k.300d.txt
 
-# The same dataset with the 10k most frequent words.
-wget ftp://ftp.mokk.bme.hu/User/daniel/glove/glove.840B.10k.300d.txt
+# Same dataset, 250k words. This takes a significant amount of time to index.
+wget ftp://ftp.mokk.bme.hu/User/daniel/glove/glove.840B.250k.300d.txt
 
 # Hungarian dataset, 200k words, dimension 200.
 wget ftp://ftp.mokk.bme.hu/User/daniel/glove/glove-hu.200k.200d.txt
 ```
 
-The English datasets were directly based on this one: [`http://nlp.stanford.edu/projects/glove/`](http://nlp.stanford.edu/projects/glove/) , like this:
+The English datasets were directly based on the [Glove](http://nlp.stanford.edu/projects/glove/) datasets, like this:
 
 ```wget http://www-nlp.stanford.edu/data/glove.42B.300d.txt.gz```
 
