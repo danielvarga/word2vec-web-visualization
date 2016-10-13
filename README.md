@@ -39,6 +39,11 @@ Click the below link, and click on some blue circles:
 You can start from any given word:
 - http://localhost:8080/vis/?q=token
 
+This is how it looks like, although without the fancy D3.js tweening:
+
+![The neighborhood of the word 'power'](http://www.renyi.hu/~daniel/images/glove-power.png)
+
+
 There's an `lp=1` argument which overrides the server-side global SVD projection feature.
 Instead of working with a global 2D embedding created at startup (see `--globalProjection`),
 we create a 2D embedding just for the neighboring words:
