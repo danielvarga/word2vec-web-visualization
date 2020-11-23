@@ -1,7 +1,7 @@
 import sys
-import BaseHTTPServer
-import SimpleHTTPServer
-import urlparse
+import http.server
+import http.server
+import urllib.parse
 import json
 import argparse
 
@@ -21,7 +21,7 @@ def getFlag(queryParsed, arg):
     return arg in queryParsed and queryParsed[arg][0]=='1'
 
 
-class MyRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
 
     # content is already serialized!
     def sendContent(self, content, format="json", status=200):
@@ -34,8 +34,8 @@ class MyRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
     def do_GET(self):
       try:
-        parsedParams = urlparse.urlparse(self.path)
-        queryParsed = urlparse.parse_qs(parsedParams.query)
+        parsedParams = urllib.parse.urlparse(self.path)
+        queryParsed = urllib.parse.parse_qs(parsedParams.query)
         query = getQuery(queryParsed)
 
         status = 200
@@ -63,7 +63,7 @@ class MyRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                             limit=limit, useGlobalProjection=useGlobalProjection)
 
         elif matches(command, ("vis",)):
-            return SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
+            return http.server.SimpleHTTPRequestHandler.do_GET(self)
 
         else:
             self.sendContent("unknown service: "+command, status=400)
@@ -77,7 +77,7 @@ class MyRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     # Allow XSS:
     def end_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
-        SimpleHTTPServer.SimpleHTTPRequestHandler.end_headers(self)
+        http.server.SimpleHTTPRequestHandler.end_headers(self)
 
 g_glove = None
 
@@ -99,7 +99,7 @@ Can be overridden with /glove/?q=query&globalProjection=0''')
 
     server_address = ('0.0.0.0', args.port)
 
-    server = BaseHTTPServer.HTTPServer(server_address, MyRequestHandler)
+    server = http.server.HTTPServer(server_address, MyRequestHandler)
     sys.stderr.write("Service has started.\n")
     server.serve_forever()
 

@@ -44,12 +44,13 @@ def read(f):
     for l in f:
         a = l.strip("\n").split(" ")
         try:
-            w = a[0].decode("utf-8")
+            w = a[0]
         except:
+            raise
             errorCount +=1
             continue
         words.append(w)
-        v = map(float, a[1:])
+        v = list(map(float, a[1:]))
         if d is not None:
             assert d==len(v)
         d = len(v)
@@ -66,7 +67,7 @@ def buildAnnoyIndex(model, words, dim):
     for i,w in enumerate(words):
         v = model[w]
         annoyIndex.add_item(i, v)
-        if i>0 and (i-1)*10/n != i*10/n:
+        if i>0 and (i-1)*10//n != i*10//n:
             logg("Annoy index building at", i*100/n, "percent.")
     end()
     start("Finalizing annoy index")
@@ -83,7 +84,7 @@ def queryAnnoyIndex(model, annoyIndex, words, dim, n):
         neis = annoyIndex.get_nns_by_item(i,3)
         if i not in neis :
             badSign += 1
-        print w, " ".join( words[i] for i in neis )
+        print(w, " ".join( words[i] for i in neis ))
         if i>0 and (i-1)*10/n != i*10/n:
                logg("Annoy index querying at", i*100/n, "percent.")
     end()
@@ -92,7 +93,8 @@ def queryAnnoyIndex(model, annoyIndex, words, dim, n):
 
 def setupGloveService(gloveFile):
     start("Reading glove datafile")
-    model, words, dim = read(file(gloveFile))
+    with open(gloveFile, "r") as f:
+        model, words, dim = read(f)
     end()
     annoyIndex = buildAnnoyIndex(model, words, dim)
     return model, words, annoyIndex, dim
@@ -160,7 +162,7 @@ class GloveService:
     def sample(self, neis, limit):
         random.seed(1234)
         neisIndexed = sorted(random.sample(list(enumerate(neis)), limit))
-        return map(operator.itemgetter(1), neisIndexed)
+        return list(map(operator.itemgetter(1), neisIndexed))
 
     def findNeighbors(self, word, limit=100, serendipity=0.0):
         wordIndex = self.reWords.get(word, -1)
@@ -176,7 +178,7 @@ class GloveService:
         return localWords
 
     def queryPure(self, wordOrWords, limit=100):
-        justAWord = isinstance(wordOrWords, basestring)
+        justAWord = isinstance(wordOrWords, str)
         if not justAWord and len(wordOrWords)==0:
             return []
         if justAWord:
@@ -208,17 +210,17 @@ def cloudToJson(localWords, reduced):
 def testSerialization():
     gloveFile, savePath = sys.argv[1:]
     gloveService = GloveService(gloveFile)
-    print gloveService.query("apple", limit=10)
+    print(gloveService.query("apple", limit=10))
     gloveService.save(savePath)
     gloveService.load(savePath)
-    print gloveService.query("apple", limit=10)
+    print(gloveService.query("apple", limit=10))
     gloveService2 = GloveService(savePath, loadStateFromSaveFile=True)
-    print gloveService2.query("apple", limit=10)
+    print(gloveService2.query("apple", limit=10))
 
 
 def testGlove(gloveService, words):
     js = gloveService.queryJson(words, limit=30, useGlobalProjection=False)
-    print json.dumps(js, indent=4)
+    print(json.dumps(js, indent=4))
 
 
 def main():
