@@ -24,7 +24,7 @@ def start(s):
     global phase
     phase = s
     logg(phase+".")
-    startTime = time.clock()
+    startTime = time.perf_counter()
 
 
 def end(s=None):
@@ -32,7 +32,7 @@ def end(s=None):
     global phase
     if s is not None:
         phase = s
-    endTime = time.clock()
+    endTime = time.perf_counter()
     logg(phase,"finished in",endTime-startTime,"seconds.")
 
 
